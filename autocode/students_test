@@ -2,6 +2,9 @@ package coverage
 
 import (
 	"os"
+	"testing"
+	"time"
+	"reflect"
 )
 
 // DO NOT EDIT THIS FUNCTION
@@ -18,3 +21,143 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
+func TestLenOk(t *testing.T) {
+	people := People{
+		Person{
+			firstName: "Alex",
+			lastName:  "Ivanov",
+			birthDay:  time.Date(2009, 11, 22, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Serhei",
+			lastName:  "Petrov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Ivan",
+			lastName:  "Sidorov",
+			birthDay:  time.Date(2001, 12, 1, 0, 0, 0, 0, time.UTC)}}
+	if people.Len() != len(people) {
+		t.Errorf("the expected length is 3, but returned is %d", people.Len())
+	}
+}
+
+func TestLessOk(t *testing.T) {
+	people := People{
+		Person{
+			firstName: "Ivan",
+			lastName:  "Sidorov",
+			birthDay:  time.Date(2011, 12, 1, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Ivan",
+			lastName:  "Petrov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Serhei",
+			lastName:  "Petrov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Serhei",
+			lastName:  "Sidorov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Serhei",
+			lastName:  "Sidorov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)}}
+
+	
+	if people.Less(1, 0) {
+		t.Errorf("the expected result is false")
+	}
+	if people.Less(2, 1) {
+		t.Errorf("the expected result is false")
+	}
+	if people.Less(3, 2) {
+		t.Errorf("the expected result is false")
+	}
+	if people.Less(4, 2) {
+		t.Errorf("the expected result is false")
+	}
+}
+
+func TestSwapOk(t *testing.T) {
+	people := People{
+		Person{
+			firstName: "Alex",
+			lastName:  "Ivanov",
+			birthDay:  time.Date(2009, 11, 22, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Serhei",
+			lastName:  "Petrov",
+			birthDay:  time.Date(2008, 1, 3, 0, 0, 0, 0, time.UTC)},
+		Person{
+			firstName: "Ivan",
+			lastName:  "Sidorov",
+			birthDay:  time.Date(2001, 12, 1, 0, 0, 0, 0, time.UTC)}}
+	people.Swap(0, 1) 
+	if (people[0].firstName != "Serhei" || people[1].firstName != "Alex") {
+		t.Errorf("swap doesn't work")
+	}
+}
+
+func TestMatrixCreation(t *testing.T){
+	_, actualErr := New(`1 2 
+						3 4`)
+
+	if actualErr != nil {
+		t.Errorf("received error %v", actualErr)
+	}
+
+	_, actualErr1 := New(`1 2 
+	4`)
+
+	if actualErr1 == nil {
+		t.Errorf("expected to get an inner error")
+	}
+
+	_, actualErr2 := New(``)
+
+	if actualErr2 == nil {
+		t.Errorf("expected to get an parser error")
+	}
+	
+}
+
+func TestMatrixRowsOk(t *testing.T){
+	expected := make([][]int, 2)
+	expected[0] = []int{1, 2}
+	expected[1] = []int{3, 4}
+
+	m, _ := New(`1 2
+	3 4`)
+	if !reflect.DeepEqual(expected, m.Rows()){
+		t.Errorf("received unexpected value")
+	}
+}
+
+func TestMatrixColsOk(t *testing.T){
+	expected := make([][]int, 2)
+	expected[0] = []int{1, 3}
+	expected[1] = []int{2, 4}
+
+	m, _ := New(`1 2
+	3 4`)
+	if !reflect.DeepEqual(expected, m.Cols()){
+		t.Errorf("received unexpected value")
+	}
+}
+
+func TestMatrixSetOk(t *testing.T){
+	m, _ := New(`1 2
+	3 4`)
+	expected := make([][]int, 2)
+	expected[0] = []int{1, 3}
+	expected[1] = []int{2, 0}
+	if m.Set(3,2,0){
+		t.Errorf("the expected result is false")
+	}
+	if m.Set(-3,-2,0){
+		t.Errorf("the expected result is false")
+	}
+	if !m.Set(1,1,0) && !reflect.DeepEqual(expected, m.Cols()){
+		t.Errorf("received unexpected value")
+	}
+}
